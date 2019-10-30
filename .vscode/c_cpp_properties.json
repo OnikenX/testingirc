@@ -3,6 +3,7 @@
         {
             "name": "Linux",
             "includePath": [
+		"${workspaceFolder}/**",
                 "/usr/include/wine/windows"
             ],
             "defines": [],

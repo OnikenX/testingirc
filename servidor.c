@@ -36,6 +36,7 @@ int main( int argc , char *argv[] )
 	// a) Crie um socket UDP (uk: create an UDP socket)
 
 	if((s = socket(PF_INET,SOCK_DGRAM,0) == INVALID_SOCKET));
+		pritf
 		Abort("Impossibilidade de abrir socket");
 
 	memset( (char*)&serv_addr, 0, sizeof(serv_addr) );
@@ -68,7 +69,7 @@ int main( int argc , char *argv[] )
 
 		timeout = 0;
 		setsockopt(s, SOL_SOCKET, SO_RCVTIMEO, (char * )timeout, sizeof(timeout));
-
+		printf("%d \n", WSAGetLastError());
 		while(nReceivedMessages < MAX_MSGS && toContinue){
 
 			// e) Aguarde pela recepcao de um datagrama UDP no socket s
