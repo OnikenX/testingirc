@@ -13,21 +13,24 @@
 
 void Abort(char *msg);
 
-int main( int argc , char *argv[] )
+int main(int argc, char *argv[])
 {
 	DWORD timeout;
 	WSADATA wsaData;
-	
+
 	SOCKET s;
 	int iResult, nbytes, size;
 	int i, toContinue;
-	struct sockaddr_in serv_addr , cli_addr;
-	struct sockaddr_in sourceMsgs[MAX_MSGS];	
+	struct sockaddr_in serv_addr, cli_addr;
+	struct sockaddr_in sourceMsgs[MAX_MSGS];
 	char response[MAX_RESPONSE];
 	double receivedValue, total, nReceivedMessages;
-	
-	iResult = WSAStartup(MAKEWORD(2,2), &wsaData);
-	if (iResult != 0) {
+
+	//!	//minhas variaviis temporarias
+
+	iResult = WSAStartup(MAKEWORD(2, 2), &wsaData);
+	if (iResult != 0)
+	{
 		printf("WSAStartup failed: %d\n", iResult);
 		getchar();
 		exit(1);
@@ -35,15 +38,14 @@ int main( int argc , char *argv[] )
 
 	// a) Crie um socket UDP (uk: create an UDP socket)
 
-	if((s = socket(PF_INET,SOCK_DGRAM,0) == INVALID_SOCKET));
-		pritf
+	if ((s = socket(PF_INET, SOCK_DGRAM, 0)) == SOCKET_ERROR)
 		Abort("Impossibilidade de abrir socket");
 
-	memset( (char*)&serv_addr, 0, sizeof(serv_addr) );
+	memset((char *)&serv_addr, 0, sizeof(serv_addr));
 	serv_addr.sin_family = AF_INET;
 	serv_addr.sin_addr.s_addr = htonl(INADDR_ANY);
 
-	// b) Preencha o campo relativo ao porto local pretendido 
+	// b) Preencha o campo relativo ao porto local pretendido
 	//	  (uk: appropriately set the value of field sin_port).
 
 	serv_addr.sin_port = htons(SERV_UDP_PORT);
@@ -51,14 +53,21 @@ int main( int argc , char *argv[] )
 	// c) Associe o socket ao porto pretendido
 	//	  (uk: bind socket s to port SERV_UDP_PORT).
 
-	if(bind(s, (struct sockaddr *)&serv_addr, sizeof(serv_addr)) == SOCKET_ERROR){
-		Abort("Impossibilidade de registar-se para escuta");		
+	if (bind(s, (struct sockaddr *)&serv_addr, sizeof(serv_addr)) == SOCKET_ERROR)
+	{
+		printf("porta fechada a tentar uma random");
+		serv_addr.sin_port = htons(0);
+		if (bind(s, (struct sockaddr *)&serv_addr, sizeof(serv_addr)) == SOCKET_ERROR)
+		{
+			Abort("Impossibilidade de registar-se para escuta");
+		}
 	}
+	printf("o port a usar se é %d", serv_addr.sin_port);
 
-	while(1){
-
-		fprintf(stderr,"\n<Servidor> Esperando nova vaga de doubles...\n\n");
-		//(uk: started waiting for a new set of double values) 
+	while (1)
+	{
+		fprintf(stdout, "\n<Servidor> Esperando nova vaga de doubles...\n\n");
+		//(uk: started waiting for a new set of double values)
 
 		nReceivedMessages = 0;
 		total = 0.0;
@@ -68,85 +77,84 @@ int main( int argc , char *argv[] )
 		//	  (uk: configure socket s with no receive timeout).
 
 		timeout = 0;
-		setsockopt(s, SOL_SOCKET, SO_RCVTIMEO, (char * )timeout, sizeof(timeout));
-		printf("%d \n", WSAGetLastError());
-		while(nReceivedMessages < MAX_MSGS && toContinue){
+		setsockopt(s, SOL_SOCKET, SO_RCVTIMEO, (char *)&timeout, sizeof(timeout));
+
+		while (nReceivedMessages < MAX_MSGS && toContinue)
+		{
 
 			// e) Aguarde pela recepcao de um datagrama UDP no socket s
 			//    (uk: receive a datagram on socket s).
 			//    O conteudo deve ser colocado na variavel receivedValue
-			//	  (uk: the content of the received datagram, which is a double 
+			//	  (uk: the content of the received datagram, which is a double
 			//	  value in binary format, goes to the memory space where variable receivedValue
 			//	  is kept).
 
 			size = sizeof(cli_addr);
-			nbytes=recvfrom(s, (char *)&receivedValue, sizeof(receivedValue) , 0 , (struct sockaddr *)&cli_addr , &size);
+			nbytes = recvfrom(s, (char*)&receivedValue, sizeof(receivedValue), 0, (struct sockaddr *)&cli_addr, &size); 
 
-			if(nbytes == SOCKET_ERROR){
+			if (nbytes == SOCKET_ERROR)
+			{
 
 				// f) Verifique se ocorreu algum timeout
 				//	  (uk: check if any timeout has occured).
 
-				if(nbytes != SOCKET_ERROR)
+				if (timeout !=)
 					toContinue = 0;
 				else
-					Abort("Erro na recepcao de datagramas");		
-
-			}else{
+					Abort("Erro na recepcao de datagramas");
+			}
+			else
+			{
 
 				// g) Guarde as coordenadas da origem da mensagem na tabela sourceMsgs no indice
-				//    com valor igual a nReceivedMessages 
+				//    com valor igual a nReceivedMessages
 				//	  (uk: save the coordinates/address of the source of the received message
 				//	  in table sourceMsgs at index nReceivedMessages).
 
-				sourceMsgs[(int)nReceivedMessages] = cli_addr;
-				
-				nReceivedMessages++;
-				total += receivedValue;
+				/*...*/
+
+				nReceivedMessages++ total += receivedValue;
 
 				printf("<Servidor> Valor recebido: %f\n", receivedValue);
 				//(uk: <Server> Received value)
 
-				if(nReceivedMessages == 1){
+				if (nReceivedMessages == 1)
+				{
 
 					// h) Active o timeout de recepcao com um valor definido pela constante TIMEOUT
-					//	  (uk: from this point forward, receive operations must be subject to a 
+					//	  (uk: from this point forward, receive operations must be subject to a
 					//	  timeout value defined by constant TIMEOUT).
 
-					timeout = TIMEOUT;
-					setsockopt(s,SOL_SOCKET, SO_RCVTIMEO, (char * )&timeout, sizeof(timeout));
-
+					timeout = /*...*/;
+					/*...*/;
 				}
-
 			}
-			
 		}
 
 		// i) Construa a resposta de acordo com o solicitado no enunciado.
 		//    Coloque a mensagem de texto resultante na variavel/string reposta.
 
 		//	  (uk: define a string that indicates the number of received messages
-		//	  and the sum of the double values they carried. Example: 
-		//	  "Number of received messages: 10 ; Sum of values: 4274672.323") 
+		//	  and the sum of the double values they carried. Example:
+		//	  "Number of received messages: 10 ; Sum of values: 4274672.323")
 
-		snprintf(response, 200, "Numero de mensagens recebidas: %d; Soma dos valores: %d", nReceivedMessages, total);
+		sprintf_s(response, /*...*/, /*...*/, nReceivedMessages, total);
 
-		for(i=0; i<nReceivedMessages; i++){
+		for (i = 0; i < nReceivedMessages; i++)
+		{
 
 			// j) envie o conteudo da variavel response a cada um dos destinos presentes na tabela sourceMsgs
 			//	  (uk: transmit the content of variable response, the previously defined string, to
 			//	  all the destinations in table sourceMsgs).
 
-			nbytes = sendto(s, response , strlen(response), 0 , (struct sockaddr *)&cli_addr,sizeof(cli_addr));
-		
-			if (nbytes == SOCKET_ERROR){
-				printf("\n<Servidor> Erro %d ao reenviar a mensagem 'a origem no indice %d da tabela\n", WSAGetLastError(), i);				
-			}
+			nbytes = sendto(s, response, /*...*/, 0, (struct sockaddr *)/*...*/, sizeof(/*...*/));
 
+			if (nbytes == SOCKET_ERROR)
+			{
+				printf("\n<Servidor> Erro %d ao reenviar a mensagem 'a origem no indice %d da tabela\n", WSAGetLastError(), i);
+			}
 		}
-		
 	}
-	
 }
 
 /*________________________________ Abort________________________________________
@@ -156,6 +164,10 @@ ________________________________________________________________________________
 
 void Abort(char *msg)
 {
-	fprintf(stderr,"<Servidor> Erro fatal: <%s> (%d)\n",msg, WSAGetLastError());
+	fprintf(stderr, "<Servidor> Erro fatal: <%s> (%d)\n", msg, WSAGetLastError());
 	exit(EXIT_FAILURE);
+}
+
+double bintodoub(char *bin)
+{
 }
