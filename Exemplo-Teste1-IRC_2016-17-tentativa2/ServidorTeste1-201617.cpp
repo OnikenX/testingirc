@@ -98,7 +98,7 @@ int main(int argc, char *argv[])
 				// f) Verifique se ocorreu algum timeout
 				//	  (uk: check if any timeout has occured).
 
-				if (timeout !=)
+				if (timeout != SOCKET_ERROR)
 					toContinue = 0;
 				else
 					Abort("Erro na recepcao de datagramas");
@@ -111,9 +111,10 @@ int main(int argc, char *argv[])
 				//	  (uk: save the coordinates/address of the source of the received message
 				//	  in table sourceMsgs at index nReceivedMessages).
 
-				/*...*/
+				sourceMsgs[(int)nReceivedMessages] = cli_addr;
 
-				nReceivedMessages++ total += receivedValue;
+				nReceivedMessages++;
+				total += receivedValue;
 
 				printf("<Servidor> Valor recebido: %f\n", receivedValue);
 				//(uk: <Server> Received value)
@@ -125,8 +126,8 @@ int main(int argc, char *argv[])
 					//	  (uk: from this point forward, receive operations must be subject to a
 					//	  timeout value defined by constant TIMEOUT).
 
-					timeout = /*...*/;
-					/*...*/;
+					timeout = TIMEOUT;
+					nbytes = recvfrom(s, (char*)&receivedValue, sizeof(receivedValue), 0, (struct sockaddr *)&cli_addr, &size);
 				}
 			}
 		}
@@ -138,16 +139,16 @@ int main(int argc, char *argv[])
 		//	  and the sum of the double values they carried. Example:
 		//	  "Number of received messages: 10 ; Sum of values: 4274672.323")
 
-		sprintf_s(response, /*...*/, /*...*/, nReceivedMessages, total);
+		snprintf(response, sizeof(response), "Numero de mensagens recebidas: %lf\nSoma dos valores: %lf \n" , nReceivedMessages, total);
 
-		for (i = 0; i < nReceivedMessages; i++)
+		for (i = 0; i < nReceivedMessages; ++i)
 		{
 
 			// j) envie o conteudo da variavel response a cada um dos destinos presentes na tabela sourceMsgs
 			//	  (uk: transmit the content of variable response, the previously defined string, to
 			//	  all the destinations in table sourceMsgs).
 
-			nbytes = sendto(s, response, /*...*/, 0, (struct sockaddr *)/*...*/, sizeof(/*...*/));
+			nbytes = sendto(s, response, sizeof(response), 0, (struct sockaddr *)&sourceMsgs[i], sizeof(sourceMsgs[i]));
 
 			if (nbytes == SOCKET_ERROR)
 			{
@@ -166,8 +167,4 @@ void Abort(char *msg)
 {
 	fprintf(stderr, "<Servidor> Erro fatal: <%s> (%d)\n", msg, WSAGetLastError());
 	exit(EXIT_FAILURE);
-}
-
-double bintodoub(char *bin)
-{
 }

@@ -17,7 +17,13 @@ void Abort(char *msg);
 
 int main( int argc , char *argv[] )
 {
-
+		//VERIFICACAO DOS ARGUMENTOS
+	if(argc != 4){
+		fprintf(stderr,"<Cliente> Sintaxe: %s valor_decimal_a_enviar ip_destino porto_destino\n",argv[0]);
+		//(uk: <Client> Sintax: %s double_value_to_send server_ip server_port\n)
+		exit(EXIT_FAILURE);
+	}
+		//DECLARACAO DAS VARIAVEIS
 	DWORD timeout;
 	WSADATA wsaData;
 	SOCKET s;
@@ -25,12 +31,6 @@ int main( int argc , char *argv[] )
 	int iResult, nbytes, size;
 	struct sockaddr_in serv_addr;
 	char response[MAX_RESPONSE];
-	
-	if(argc != 4){
-		fprintf(stderr,"<Cliente> Sintaxe: %s valor_decimal_a_enviar ip_destino porto_destino\n",argv[0]);
-		//(uk: <Client> Sintax: %s double_value_to_send server_ip server_port\n)
-		exit(EXIT_FAILURE);
-	}
 
 	iResult = WSAStartup(MAKEWORD(2,2), &wsaData);
 	if (iResult != 0) {
@@ -41,7 +41,7 @@ int main( int argc , char *argv[] )
 
 	// a) Crie um socket UDP (uk: create an UDP socket).
 
-	s = socket( PF_INET , /*...*/ , /*...*/ );
+	s = socket( PF_INET , SOCK_DGRAM , IPPROTO_UDP );
 
 	if(s == INVALID_SOCKET)
 		Abort("Impossibilidade de criar socket");
